@@ -1,0 +1,23 @@
+LOAD DATABASE
+     FROM mysql://zabbix:zabbix@localhost/zabbix_v01
+     INTO postgresql://xxx:xxx@Server:Port/zabbix_v01?sslmode=require
+
+WITH data only,
+     truncate,
+     workers = 2, concurrency = 1,
+     batch rows = 5000,
+     prefetch rows = 5000
+
+SET MySQL PARAMETERS
+     net_read_timeout = '600',
+     net_write_timeout = '600'
+
+CAST type datetime to timestamptz,
+     type timestamp to timestamptz
+
+INCLUDING ONLY TABLE NAMES MATCHING
+     ~/^history/, ~/^trends/, 'auditlog'
+
+ALTER SCHEMA 'zabbix' RENAME TO 'public'
+
+;
